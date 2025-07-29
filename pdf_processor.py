@@ -1,32 +1,15 @@
 from PyPDF2 import PdfReader, PdfWriter
 import fitz  # PyMuPDF
-from PIL import Image
 import io
 import re
-import pandas as pd
 import zipfile
 import os
-import tempfile
 from datetime import datetime
 
 
 class PDFProcessor:
     def __init__(self):
-        # Initialize OCR capability check
-        self.ocr_available = self.check_ocr_support()
-        
-    def check_ocr_support(self):
-        """Check if PyMuPDF supports OCR"""
-        try:
-            # PyMuPDF 1.23+ has built-in OCR via get_textpage_ocr()
-            doc = fitz.open()  # Create empty document to test
-            page = doc.new_page()  # Create a test page
-            # Check if OCR method exists
-            has_ocr = hasattr(page, 'get_textpage_ocr')
-            doc.close()
-            return has_ocr
-        except Exception:
-            return False
+        pass
         
     def extract_text_with_ocr(self, pdf_path, log_callback=None):
         """Extract text from PDF using PyMuPDF's OCR capabilities"""
@@ -191,18 +174,21 @@ class PDFProcessor:
             if progress_callback:
                 progress_callback(85, "Grouping pages by employee...")
             
-            # Group pages by employee
-            df = pd.DataFrame(all_rows)
+            # Group pages by employee (pure Python)
+            grouped = {}
+            for row in all_rows:
+                name = row["Name"]
+                if name not in grouped:
+                    grouped[name] = []
+                grouped[name].append(row)
             if log_callback:
-                log_callback(f"Found {len(df)} total pages")
-                employees = df['Name'].unique()
+                log_callback(f"Found {sum(len(v) for v in grouped.values())} total pages")
+                employees = list(grouped.keys())
                 log_callback(f"Found employees: {', '.join(employees)}")
-            
-            grouped = df.groupby("Name")
-            
+
             # Create output
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            
+
             if create_zip:
                 return self.create_zip_output(grouped, output_folder, timestamp, progress_callback, log_callback)
             else:

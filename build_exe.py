@@ -1,21 +1,19 @@
 import PyInstaller.__main__
 import os
-import sys
 
 def build_executable():
     """Build the executable using PyInstaller"""
     
     # Define the build arguments
     args = [
-        '--onefile',                    # Create a single executable file
-        '--windowed',                   # Don't show console window (GUI app)
-        '--name=TimesheetProcessor',    # Name of the executable
-        '--icon=icon.ico',              # Icon file (optional - you can create one)
-        '--add-data=pdf_processor.py;.',# Include the processor module
-        '--hidden-import=fitz',         # Ensure PyMuPDF is included
-        '--hidden-import=PIL',          # Ensure PIL is included
-        '--clean',                      # Clean PyInstaller cache and build folders
-        'main.py'                       # Main script
+        '--onefile',
+        '--windowed',
+        '--name=TimesheetProcessor',
+        '--add-data=pdf_processor.py;.',
+        '--hidden-import=fitz',
+        '--hidden-import=PIL',
+        '--clean',
+        'main.py'
     ]
     
     # Remove icon argument if icon file doesn't exist

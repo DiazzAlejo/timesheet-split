@@ -17,25 +17,9 @@ def check_dependencies():
     """Check if all Python dependencies are installed"""
     try:
         import fitz  # PyMuPDF
-        import pandas
         from PIL import Image
         print("✓ All Python dependencies are available")
-        
-        # Test PyMuPDF OCR support
-        try:
-            doc = fitz.open()
-            page = doc.new_page()
-            has_ocr = hasattr(page, 'get_textpage_ocr')
-            doc.close()
-            if has_ocr:
-                print("✓ PyMuPDF OCR support available")
-            else:
-                print("⚠ PyMuPDF OCR not available (will use basic text extraction)")
-            return True
-        except Exception as e:
-            print(f"⚠ PyMuPDF test failed: {e}")
-            return True  # Still return True as basic functionality will work
-            
+        return True
     except ImportError as e:
         print(f"✗ Missing Python dependency: {e}")
         print("Please run: pip install -r requirements.txt")
