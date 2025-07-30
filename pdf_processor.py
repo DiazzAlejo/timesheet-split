@@ -211,7 +211,7 @@ class PDFProcessor:
             files_created = 0
             with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
                 total_employees = len(grouped)
-                for emp_idx, (name, group) in enumerate(grouped):
+                for emp_idx, (name, group) in enumerate(grouped.items()):
                     if progress_callback:
                         progress = 85 + (emp_idx / total_employees) * 15
                         progress_callback(progress, f"Creating PDF for {name}")
@@ -222,17 +222,19 @@ class PDFProcessor:
                     # Create PDF for this employee
                     writer = PdfWriter()
                     
-                    # Group pages by PDF file to minimize file operations
-                    file_groups = group.groupby('pdf_file')
-                    
-                    for pdf_file, file_group in file_groups:
+                    # Group pages by PDF file using pure Python
+                    file_groups = {}
+                    for row in group:
+                        pdf_file = row['pdf_file']
+                        if pdf_file not in file_groups:
+                            file_groups[pdf_file] = []
+                        file_groups[pdf_file].append(row)
+                    for pdf_file, file_group in file_groups.items():
                         try:
-                            # Open the original PDF file fresh for each file group
                             with open(pdf_file, 'rb') as f:
                                 reader = PdfReader(f)
-                                
-                                # Add pages from this file
-                                for _, row in file_group.sort_values("pageNum").iterrows():
+                                sorted_rows = sorted(file_group, key=lambda r: r['pageNum'])
+                                for row in sorted_rows:
                                     page_num = row["pageNum"] - 1  # Convert to 0-based index
                                     if page_num < len(reader.pages):
                                         writer.add_page(reader.pages[page_num])
@@ -290,7 +292,7 @@ class PDFProcessor:
             created_files = []
             total_employees = len(grouped)
             
-            for emp_idx, (name, group) in enumerate(grouped):
+            for emp_idx, (name, group) in enumerate(grouped.items()):
                 if progress_callback:
                     progress = 85 + (emp_idx / total_employees) * 15
                     progress_callback(progress, f"Creating PDF for {name}")
@@ -301,17 +303,19 @@ class PDFProcessor:
                 # Create PDF for this employee
                 writer = PdfWriter()
                 
-                # Group pages by PDF file to minimize file operations
-                file_groups = group.groupby('pdf_file')
-                
-                for pdf_file, file_group in file_groups:
+                # Group pages by PDF file using pure Python
+                file_groups = {}
+                for row in group:
+                    pdf_file = row['pdf_file']
+                    if pdf_file not in file_groups:
+                        file_groups[pdf_file] = []
+                    file_groups[pdf_file].append(row)
+                for pdf_file, file_group in file_groups.items():
                     try:
-                        # Open the original PDF file fresh for each file group
                         with open(pdf_file, 'rb') as f:
                             reader = PdfReader(f)
-                            
-                            # Add pages from this file
-                            for _, row in file_group.sort_values("pageNum").iterrows():
+                            sorted_rows = sorted(file_group, key=lambda r: r['pageNum'])
+                            for row in sorted_rows:
                                 page_num = row["pageNum"] - 1  # Convert to 0-based index
                                 if page_num < len(reader.pages):
                                     writer.add_page(reader.pages[page_num])

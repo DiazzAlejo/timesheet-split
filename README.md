@@ -60,7 +60,7 @@ A standalone Windows application that automatically splits timesheet PDFs by emp
 pip install -r requirements.txt
 ```
 
-This will install PyMuPDF, PyPDF2, Pandas, and other required packages.
+This will install PyMuPDF and PyPDF2 only. No pandas, Pillow, or EasyOCR required.
 
 #### Setup (Optional)
 
@@ -124,7 +124,6 @@ pyinstaller --onefile --windowed --add-data "*.py;." main.py
 ### **Dependencies**
 - PyPDF2 3.0.1: PDF manipulation
 - PyMuPDF 1.24.5: OCR and text extraction
-- Pandas 2.2.2: Data processing
 - Tkinter: GUI framework (included with Python)
 - PyInstaller 6.8.0: Executable creation
 
@@ -159,7 +158,7 @@ This project is open source. Feel free to use, modify, and distribute.
 
 ---
 
-**Latest Release**: v1.0.0 | **File Size**: 228MB | **Last Updated**: July 29, 2025
+**Latest Release**: v1.0.0 | **File Size**: Aggressively optimized (UPX compressed, minimal dependencies) | **Last Updated**: July 30, 2025
 3. **Text extraction**: The app will try OCR if normal text extraction finds little content
 
 ### Error Messages

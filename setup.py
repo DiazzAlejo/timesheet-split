@@ -17,7 +17,6 @@ def check_dependencies():
     """Check if all Python dependencies are installed"""
     try:
         import fitz  # PyMuPDF
-        from PIL import Image
         print("✓ All Python dependencies are available")
         return True
     except ImportError as e:
@@ -47,7 +46,6 @@ def main():
     if success:
         print("✓ Setup completed successfully!")
         print("You can now run: python main.py")
-        print("\nNote: EasyOCR will download language models (~50MB) on first use")
     else:
         print("✗ Setup completed with errors")
         print("Please install missing dependencies before running the application")

@@ -11,38 +11,77 @@ class TimesheetProcessorGUI:
         self.root.geometry("800x600")
         self.root.minsize(600, 400)
         
-        # Configure style
+        # Configure style for a modern look
         style = ttk.Style()
         style.theme_use('clam')
+        style.configure('TFrame', background='#f7f7fa')
+        style.configure('TButton', font=('Segoe UI', 10, 'bold'), padding=6)
+        style.configure('TLabel', background='#f7f7fa', font=('Segoe UI', 10))
+        style.configure('Header.TLabel', background='#f7f7fa', font=('Segoe UI', 14, 'bold'))
+        style.configure('TEntry', font=('Segoe UI', 10))
         
         self.pdf_files = []
-        self.output_folder = ""
+        # Set default output folder to Downloads
+        self.output_folder = os.path.join(os.path.expanduser('~'), 'Downloads')
         self.processor = PDFProcessor()
-        
+        self.progress_var = tk.DoubleVar(value=0)
+        self.status_var = tk.StringVar(value="Ready")
         self.setup_ui()
         
         
     def setup_ui(self):
         # Main frame
-        main_frame = ttk.Frame(self.root, padding="10")
+        main_frame = ttk.Frame(self.root, padding="18")
         main_frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
         self.root.columnconfigure(0, weight=1)
         self.root.rowconfigure(0, weight=1)
         main_frame.columnconfigure(1, weight=1)
+
+        # Header
+        header = ttk.Label(main_frame, text="Timesheet PDF Processor", style='Header.TLabel')
+        header.grid(row=0, column=0, columnspan=3, pady=(0, 18))
+
         # File selection section
-        self.files_listbox = tk.Listbox(main_frame, height=4)
-        self.files_listbox.grid(row=0, column=0, columnspan=2, sticky=(tk.W, tk.E), pady=(0, 10))
-        ttk.Button(main_frame, text="Add PDF Files", command=self.add_pdf_files).grid(row=1, column=0, sticky=tk.W, padx=(0, 5))
-        ttk.Button(main_frame, text="Clear Files", command=self.clear_files).grid(row=1, column=1, sticky=tk.W)
-        ttk.Label(main_frame, text="Output Folder:").grid(row=2, column=0, sticky=tk.W, padx=(0, 10))
+        files_label = ttk.Label(main_frame, text="Selected PDF Files:")
+        files_label.grid(row=1, column=0, sticky=tk.W, pady=(0, 4))
+        self.files_listbox = tk.Listbox(main_frame, height=6, font=('Segoe UI', 10), bg='#fff', relief='groove', borderwidth=2)
+        self.files_listbox.grid(row=2, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=(0, 10))
+
+        add_btn = ttk.Button(main_frame, text="Add PDF Files", command=self.add_pdf_files)
+        add_btn.grid(row=3, column=0, sticky=tk.W, padx=(0, 5), pady=(0, 10))
+        clear_btn = ttk.Button(main_frame, text="Clear Files", command=self.clear_files)
+        clear_btn.grid(row=3, column=1, sticky=tk.W, pady=(0, 10))
+
+        # Output folder section
+        out_label = ttk.Label(main_frame, text="Output Folder:")
+        out_label.grid(row=4, column=0, sticky=tk.W, padx=(0, 10), pady=(10, 0))
         self.output_var = tk.StringVar()
-        self.output_entry = ttk.Entry(main_frame, textvariable=self.output_var, state='readonly')
-        self.output_entry.grid(row=2, column=1, sticky=(tk.W, tk.E), padx=(0, 10))
-        ttk.Button(main_frame, text="Browse", command=self.select_output_folder).grid(row=2, column=2)
+        self.output_entry = ttk.Entry(main_frame, textvariable=self.output_var, state='readonly', width=40)
+        self.output_entry.grid(row=4, column=1, sticky=(tk.W, tk.E), padx=(0, 10), pady=(10, 0))
+        browse_btn = ttk.Button(main_frame, text="Browse", command=self.select_output_folder)
+        browse_btn.grid(row=4, column=2, pady=(10, 0))
+
+        # Progress bar
+        self.progress_bar = ttk.Progressbar(main_frame, variable=self.progress_var, maximum=100, length=300)
+        self.progress_bar.grid(row=5, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=(10, 0))
+
+        # Process button
         self.process_button = ttk.Button(main_frame, text="Process PDFs", command=self.start_processing)
-        self.process_button.grid(row=3, column=0, columnspan=3, pady=20)
-        self.log_text = scrolledtext.ScrolledText(main_frame, height=8, state='disabled')
-        self.log_text.grid(row=4, column=0, columnspan=3, sticky=(tk.W, tk.E, tk.N, tk.S))
+        self.process_button.grid(row=6, column=0, columnspan=3, pady=24, sticky=(tk.W, tk.E))
+
+        # Log section
+        log_label = ttk.Label(main_frame, text="Processing Log:")
+        log_label.grid(row=7, column=0, sticky=tk.W, pady=(10, 4))
+        self.log_text = scrolledtext.ScrolledText(main_frame, height=10, font=('Consolas', 10), bg='#f9f9f9', relief='groove', borderwidth=2, state='disabled')
+        self.log_text.grid(row=8, column=0, columnspan=3, sticky=(tk.W, tk.E, tk.N, tk.S), pady=(0, 10))
+
+        # Make resizing smooth
+        for i in range(9):
+            main_frame.rowconfigure(i, weight=0)
+        main_frame.rowconfigure(8, weight=1)
+        main_frame.columnconfigure(0, weight=1)
+        main_frame.columnconfigure(1, weight=1)
+        main_frame.columnconfigure(2, weight=1)
         
     def add_pdf_files(self):
         files = filedialog.askopenfilenames(

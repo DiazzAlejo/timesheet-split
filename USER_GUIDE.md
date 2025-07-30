@@ -14,7 +14,7 @@ This application automatically splits timesheet PDFs by employee name, creating 
    - Click "Browse" to choose where to save results
    - Click "Process PDFs" to start
 
-**That's it!** No Python, no installations, no external software needed.
+**That's it!** No Python, no installations, no external software needed. Minimal dependencies, fastest startup, smallest download size.
 
 ## 📁 **What You Get**
 
@@ -29,7 +29,7 @@ This application automatically splits timesheet PDFs by employee name, creating 
 
 ## 💡 **Tips**
 
-- **File Size**: The .exe is ~228MB (includes everything needed)
+- **File Size**: The .exe is aggressively optimized and compressed (UPX, minimal dependencies)
 - **Performance**: Can handle large PDFs with hundreds of pages
 - **Employee Detection**: Looks for "for: [Employee Name] DEN" pattern
 - **OCR Support**: Automatically handles scanned/image PDFs
@@ -47,8 +47,3 @@ If you encounter issues:
 2. Try processing smaller batches of files
 3. Ensure PDFs contain the expected employee name format
 
----
-
-**File Version**: Built on July 29, 2025
-**File Size**: 228MB
-**Dependencies**: None (completely self-contained)

@@ -63,7 +63,7 @@ git push
 ## 📋 **Recommended Approach**
 
 ### **For Maximum Accessibility:**
-1. **GitHub Releases**: Upload .exe as release asset
+1. **GitHub Releases**: Upload .exe as release asset (aggressively optimized, UPX compressed, minimal dependencies)
 2. **Include Documentation**: Add USER_GUIDE.md to repository
 3. **Clear README**: Instructions for downloading and using
 4. **Release Notes**: Document features and updates
