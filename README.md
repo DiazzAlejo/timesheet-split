@@ -85,12 +85,23 @@ python main.py
    - Choose to create ZIP file or individual PDFs
 4. **Process**: Click "Process PDFs" to start processing
 
+
 ### Employee Name Detection
 
 The application looks for employee names using this pattern:
 - `for: [Employee Name] DEN`
 
-You can modify the pattern in `pdf_processor.py` in the `extract_employee_name()` method.
+#### Special Case: Pages with Different Dimensions
+
+If a page's dimensions are different from the first page in the PDF, the app will hardcode the employee name detection to look for one of these names in the page text:
+
+- Vazquez, Erick (Erick)
+- Kent, Richard A
+- McDonald, Kristen H
+
+This ensures correct employee assignment for pages with unique layouts or formats at the end of the document.
+
+You can modify the pattern or the hardcoded names in `pdf_processor.py` in the `extract_employee_name()` method and the `process_pdfs()` logic.
 
 ## 🛠️ **For Developers**
 
@@ -127,12 +138,23 @@ pyinstaller --onefile --windowed --add-data "*.py;." main.py
 - Tkinter: GUI framework (included with Python)
 - PyInstaller 6.8.0: Executable creation
 
+
 ### **Employee Name Detection**
 
 The application looks for employee names using this pattern:
 - `for: [Employee Name] DEN`
 
-You can modify the pattern in `pdf_processor.py` in the `extract_employee_name()` method.
+#### Special Case: Pages with Different Dimensions
+
+If a page's dimensions are different from the first page in the PDF, the app will hardcode the employee name detection to look for one of these names in the page text:
+
+- Vazquez, Erick (Erick)
+- Kent, Richard A
+- McDonald, Kristen H
+
+This ensures correct employee assignment for pages with unique layouts or formats at the end of the document.
+
+You can modify the pattern or the hardcoded names in `pdf_processor.py` in the `extract_employee_name()` method and the `process_pdfs()` logic.
 
 ## 📞 **Support**
 

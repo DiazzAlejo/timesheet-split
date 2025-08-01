@@ -27,11 +27,17 @@ This application automatically splits timesheet PDFs by employee name, creating 
 **Input**: 3 PDF files with 119 employees
 **Output**: 1 ZIP file containing 119 individual PDFs (one per employee)
 
+
 ## 💡 **Tips**
 
 - **File Size**: The .exe is aggressively optimized and compressed (UPX, minimal dependencies)
 - **Performance**: Can handle large PDFs with hundreds of pages
 - **Employee Detection**: Looks for "for: [Employee Name] DEN" pattern
+- **Special Case**: If a page's dimensions are different from the first page in the PDF, the app will hardcode the employee name detection to look for one of these names in the page text:
+  - Vazquez, Erick (Erick)
+  - Kent, Richard A
+  - McDonald, Kristen H
+  This ensures correct employee assignment for pages with unique layouts or formats at the end of the document.
 - **OCR Support**: Automatically handles scanned/image PDFs
 
 ## 🔧 **System Requirements**

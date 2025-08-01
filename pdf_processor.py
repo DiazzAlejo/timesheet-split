@@ -103,32 +103,39 @@ class PDFProcessor:
         return ""
     
     def process_pdfs(self, pdf_files, options):
-        """Main processing function"""
+        """Main processing function with page dimension check for hardcoded employee names"""
         try:
             progress_callback = options.get('progress_callback')
             log_callback = options.get('log_callback')
             ocr_enabled = options.get('ocr_enabled', True)
             create_zip = options.get('create_zip', True)
             output_folder = options.get('output_folder')
-            
+
+            # Hardcoded employee names for special page dimensions
+            special_names = [
+                "Vazquez, Erick (Erick)",
+                "Kent, Richard A",
+                "McDonald, Kristen H"
+            ]
+
             total_files = len(pdf_files)
             all_rows = []
-            
+
             if log_callback:
                 log_callback(f"Starting to process {total_files} PDF files")
                 log_callback(f"OCR enabled: {ocr_enabled}")
-            
+
             # Process each PDF file
             for file_idx, pdf_path in enumerate(pdf_files):
                 try:
                     if log_callback:
                         log_callback(f"Processing file {file_idx + 1}/{total_files}: {os.path.basename(pdf_path)}")
-                    
+
                     # Update progress
                     base_progress = (file_idx / total_files) * 80  # 80% for processing files
                     if progress_callback:
                         progress_callback(base_progress, f"Processing {os.path.basename(pdf_path)}")
-                    
+
                     # Extract text based on OCR setting
                     if ocr_enabled:
                         try:
@@ -139,41 +146,56 @@ class PDFProcessor:
                             pages_data = self.extract_text_regular(pdf_path, log_callback)
                     else:
                         pages_data = self.extract_text_regular(pdf_path, log_callback)
-                    
-                    # Process each page
+
+                    # Get page dimensions using PyMuPDF
+                    import fitz
+                    doc = fitz.open(pdf_path)
+                    first_page_rect = doc[0].rect if len(doc) > 0 else None
+
                     previous_name = "Unknown"
                     for page_data in pages_data:
                         text = page_data['text']
                         page_num = page_data['page_num']
-                        
+
+                        # Get current page dimension
+                        page_rect = doc[page_num - 1].rect if (page_num - 1) < len(doc) else None
+                        is_special_dim = (first_page_rect is not None and page_rect is not None and page_rect != first_page_rect)
+
                         # Extract employee name
-                        name = self.extract_employee_name(text)
-                        
+                        if is_special_dim:
+                            # Look for any of the special names in the text
+                            found_name = next((n for n in special_names if n.lower() in text.lower()), None)
+                            name = found_name if found_name else previous_name
+                        else:
+                            name = self.extract_employee_name(text)
+
                         # Fill down name if missing
                         if not name:
                             name = previous_name
                         else:
                             previous_name = name
-                        
+
                         all_rows.append({
                             "Name": name,
                             "pageNum": page_num,
                             "Text": text,
                             "pdf_file": pdf_path
                         })
-                        
+
+                    doc.close()
+
                 except Exception as e:
                     if log_callback:
                         log_callback(f"Error processing file {pdf_path}: {str(e)}")
                     # Continue with next file
                     continue
-            
+
             if not all_rows:
                 return {"success": False, "error": "No pages were successfully processed"}
-            
+
             if progress_callback:
                 progress_callback(85, "Grouping pages by employee...")
-            
+
             # Group pages by employee (pure Python)
             grouped = {}
             for row in all_rows:
@@ -193,7 +215,7 @@ class PDFProcessor:
                 return self.create_zip_output(grouped, output_folder, timestamp, progress_callback, log_callback)
             else:
                 return self.create_individual_pdfs(grouped, output_folder, timestamp, progress_callback, log_callback)
-                
+
         except Exception as e:
             if log_callback:
                 log_callback(f"Critical error in process_pdfs: {str(e)}")
