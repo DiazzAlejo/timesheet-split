@@ -9,11 +9,10 @@ def build_executable():
         '--onefile',
         '--windowed',
         '--name=TimesheetProcessor',
-        '--add-data=pdf_processor.py;.',
         '--hidden-import=fitz',
-        '--strip',
-        '--upx-dir=upx',  # assumes UPX is installed in ./upx or in PATH
         '--clean',
+        '--upx-dir=upx',  # assumes UPX is installed in ./upx or in PATH
+        '--strip',
         'main.py'
     ]
 
